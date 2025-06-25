@@ -24,6 +24,18 @@
   .card-hover {
     @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
   }
+
+  .slider {
+    @apply bg-gray-200 rounded-lg appearance-none cursor-pointer;
+  }
+
+  .slider::-webkit-slider-thumb {
+    @apply appearance-none w-5 h-5 bg-plasma-500 rounded-full cursor-pointer;
+  }
+
+  .slider::-moz-range-thumb {
+    @apply w-5 h-5 bg-plasma-500 rounded-full cursor-pointer border-0;
+  }
 }
 
 /* Custom scrollbar */
@@ -41,4 +53,9 @@
 
 ::-webkit-scrollbar-thumb:hover {
   @apply bg-plasma-500;
+}
+
+/* Add section ID for navigation */
+#configuration {
+  scroll-margin-top: 80px;
 }

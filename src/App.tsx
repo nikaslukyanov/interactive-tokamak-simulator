@@ -6,6 +6,7 @@ import Features from './components/Features'
 import SimulationDashboard from './components/SimulationDashboard'
 import TechnicalSpecs from './components/TechnicalSpecs'
 import Examples from './components/Examples'
+import TokamakConfiguration from './components/TokamakConfiguration'
 import Footer from './components/Footer'
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
         <SimulationDashboard />
         <TechnicalSpecs />
         <Examples />
+        <TokamakConfiguration />
       </main>
       <Footer />
     </div>
