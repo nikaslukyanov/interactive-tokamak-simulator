@@ -128,8 +128,8 @@ with col1:
     
     major_radius = st.slider("Major Radius (m)", 3.0, 6.0, 4.55, 0.05)
     minor_radius = st.slider("Minor Radius (m)", 0.8, 2.0, 1.2, 0.05)
-    elongation = st.slider("Elongation", 1.0, 2.0, 1.4, 0.1)
-    triangularity = st.slider("Triangularity", -0.8, 0.8, -0.5, 0.1)
+    elongation = st.slider("Elongation", 1.0, 2.0, 1.4, 0.05)
+    triangularity = st.slider("Triangularity", -0.8, 0.8, -0.5, 0.05)
     
     col_a, col_b = st.columns(2)
     
@@ -149,21 +149,22 @@ with col1:
             st.session_state.vv_coords.append([avg_r, avg_z])
             st.rerun()
         
-        if st.button("Add Coil", key="add_coil"):
-            if len(st.session_state.coil_coords) < 8:
+        # if st.button("Add Coil", key="add_coil"):
+        #     if len(st.session_state.coil_coords) < 8:
 
-                point_1 = random.choice(st.session_state.coil_coords)
-                point_1_index = st.session_state.coil_coords.index(point_1)
-                remaining_coords = [coord for i, coord in enumerate(st.session_state.coil_coords) if i != point_1_index]
-                point_2 = random.choice(remaining_coords)
+        #         point_1 = random.choice(st.session_state.coil_coords)
+        #         point_1_index = st.session_state.coil_coords.index(point_1)
+        #         remaining_coords = [coord for i, coord in enumerate(st.session_state.coil_coords) if i != point_1_index]
+        #         point_2 = random.choice(remaining_coords)
 
-                avg_r = (point_1[0] + point_2[0]) / 2
-                avg_z = (point_1[1] + point_2[1]) / 2
+        #         avg_r = (point_1[0] + point_2[0]) / 2
+        #         avg_z = (point_1[1] + point_2[1]) / 2
 
-                st.session_state.coil_coords.append([avg_r,avg_z])
-                st.rerun()
-            else: 
-                st.warning("You can only have 8 coils maximum")
+        #         st.session_state.coil_coords.append([avg_r,avg_z])
+        #         st.rerun()
+        #     else: 
+        #         st.warning("You can only have 8 coils maximum")
+        
     
     with col_b:
         if st.button("Delete VV Point", key="del_vv"): 
@@ -173,13 +174,47 @@ with col1:
                 st.warning("You can only have 4 VV points minimum")
             st.rerun()
 
+
+        # if st.button("Delete Last Coil", key="del_coil"): 
+        #     if len(st.session_state.coil_coords) > 4:
+        #         st.session_state.coil_coords.pop()
+        #     else:
+        #         st.warning("You can only have 4 coils minimum")
+        #     st.rerun()
         
-        if st.button("Delete Last Coil", key="del_coil"): 
-            if len(st.session_state.coil_coords) > 4:
-                st.session_state.coil_coords.pop()
-            else:
-                st.warning("You can only have 4 coils minimum")
-            st.rerun()
+
+    # Advanced Settings Section
+    st.subheader("Advanced Settings")
+    
+    # Initialize session state for advanced settings visibility
+    if 'show_advanced' not in st.session_state:
+        st.session_state.show_advanced = False
+    
+    # Toggle button for advanced settings
+    if st.button("⚙️ Show Advanced Parameters" if not st.session_state.show_advanced else "⚙️ Hide Advanced Parameters"):
+        st.session_state.show_advanced = not st.session_state.show_advanced
+        st.rerun()
+    
+    # Show advanced parameters if toggled on
+    if st.session_state.show_advanced:
+        st.markdown("**Magnetic Field & Current Parameters**")
+        
+        B0 = st.number_input("B0 (Toroidal Magnetic Field)", value=11.0, format="%.2f")
+        Ip_target = st.number_input("Ip_target", value=8E6, format="%.0f")
+        Ip_ratio_target = st.number_input("Ip_ratio_target", value=0.333, format="%.3f")
+        ffp_alpha = st.number_input("ffp_alpha", value=2.15, format="%.2f")
+        ffp_gamma = st.number_input("ffp_gamma", value=1.7, format="%.2f")
+        pp_alpha = st.number_input("pp_alpha", value=2.15, format="%.2f")
+        pp_gamma = st.number_input("pp_gamma", value=1.7, format="%.2f")
+    else:
+        # Set default values when advanced settings are hidden
+        B0 = 11.0
+        Ip_target = 8E6
+        Ip_ratio_target = 0.333
+        ffp_alpha = 2.15
+        ffp_gamma = 1.7
+        pp_alpha = 2.15
+        pp_gamma = 1.7
 
 with col2:
     st.header("Vacuum Vessel Design")
@@ -344,10 +379,10 @@ with col2:
             with col_slider_r:
                 new_r = st.slider(
                     f"R Position (m)", 
-                    min_value=1.0, 
+                    min_value=0.5,
                     max_value=8.0, 
                     value=current_r, 
-                    step=0.05,
+                    step=0.1,
                     key=f"slider_vv_r_{idx}"
                 )
             
@@ -357,7 +392,7 @@ with col2:
                     min_value=-3.0, 
                     max_value=3.0, 
                     value=current_z, 
-                    step=0.05,
+                    step=0.1,
                     key=f"slider_vv_z_{idx}"
                 )
             
@@ -404,8 +439,8 @@ with col2:
             with col_slider_z:
                 new_z = st.slider(
                     f"Z Position (m)", 
-                    min_value=-3.0, 
-                    max_value=3.0, 
+                    min_value=-4.0, 
+                    max_value=4.0, 
                     value=current_z, 
                     step=0.05,
                     key=f"slider_coil_z_{idx}"
@@ -492,6 +527,15 @@ with col_lock:
                 "minor_radius": minor_radius,
                 "elongation": elongation,
                 "triangularity": triangularity
+            },
+            "advanced_settings": {
+                "B0": B0,
+                "Ip_target": Ip_target,
+                "Ip_ratio_target": Ip_ratio_target,
+                "ffp_alpha": ffp_alpha,
+                "ffp_gamma": ffp_gamma,
+                "pp_alpha": pp_alpha,
+                "pp_gamma": pp_gamma
             },
             "vacuum_vessel": {
                 "boundary_coordinates": st.session_state.vv_coords
@@ -690,15 +734,24 @@ if 'analysis_completed' in st.session_state and st.session_state.analysis_comple
     
     # Add button to clear results
     if st.button("🗑️ Clear Results"):
+        # Clear analysis-related session state
         if 'analysis_completed' in st.session_state:
             del st.session_state.analysis_completed
         if 'output_folder' in st.session_state:
             del st.session_state.output_folder
+        if 'locked_design' in st.session_state:
+            del st.session_state.locked_design
+        if 'design_file' in st.session_state:
+            del st.session_state.design_file
 
+        # Clear files
         files = glob.glob('examples/testing_1/*')
         for f in files:
             if os.path.isfile(f):
                 os.remove(f)
             elif os.path.isdir(f):
                 shutil.rmtree(f)
+        
+        # Force a complete page reload by clearing more session state
+        st.cache_data.clear()
         st.rerun()
