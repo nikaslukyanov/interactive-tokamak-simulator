@@ -37,12 +37,11 @@ The Streamlit-based interactive visualizer (`streamlit_app.py`) provides a compr
 ### Prerequisites
 - Python 3.x
 - OpenFUSIONToolkit
-- Standard scientific Python packages
+- Packages in requirements.txt and others in AOE_tokamaker.py and streamlit_app.py
 
 ### Setup
-1. Install OpenFUSIONToolkit following their documentation (v1.0.0-beta5 version released Jan 23 2025)
+1. Install OpenFUSIONToolkit following their documentation (v1.0.0-beta5 version released Jan 23, 2025)
 2. Clone this repository
-3. Install required packages: `pip install streamlit plotly pillow`
 4. Ensure OpenFUSIONToolkit is accessible in your Python path
 5. **Launch Interactive Visualizer**: `streamlit run streamlit_app.py`
 6. **Alternative**: Use Jupyter notebook directly with `AOE_tokamaker.ipynb`
@@ -91,7 +90,6 @@ The Streamlit-based interactive visualizer (`streamlit_app.py`) provides a compr
 - **Vacuum Vessel Visualization**: Gray-filled vessel walls with inner/outer boundaries
 - **Coil Position Mapping**: Color-coded coil locations with validation status
 - **Automated Results Display**: Automatic loading of simulation outputs (PNG, GIF)
-- **Timestamped Output Management**: Organized folder structure for reproducible results
 
 ### Customization
 - **Interactive Parameter Adjustment**: Real-time sliders for all plasma and magnetic field parameters
@@ -140,8 +138,7 @@ The system automatically creates designs and saves them in the testing_1 folder
 
 The `examples/` directory contains:
 - **Simulation Runs**: Timestamped folders with complete simulation outputs
-- **VDE Analysis**: Vertical Displacement Event studies (`CUTE_VDE_ex.ipynb`)
-- **General Simulations**: Standard tokamak simulation examples (`CUTE_sim.ipynb`)
+- **Negative Triangularity Example**: Default example of a tokamaker with negative triangularity 
 
 ## Contributing
 
