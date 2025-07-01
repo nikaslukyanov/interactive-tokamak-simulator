@@ -1,6 +1,6 @@
-# AOE TokaMaker - Tokamak Plasma Simulation Toolkit
+# Tokamak Plasma Visualizing Tool Kit
 
-A comprehensive tokamak plasma simulation toolkit built on TokaMaker from the OpenFUSIONToolkit, designed for Grad-Shafranov equation solving and plasma equilibrium analysis.
+A comprehensive tokamak plasma simulation toolkit built on TokaMaker from the OpenFUSIONToolkit, designed for visualizing of vertical displacement events. 
 
 ## Overview
 
@@ -14,10 +14,10 @@ This project provides a complete framework for tokamak plasma simulation, includ
 ### Prerequisites
 - Python 3.x
 - OpenFUSIONToolkit
-- Standard scientific Python packages (numpy, matplotlib, etc.)
+- Standard scientific Python packages
 
 ### Setup
-1. Install OpenFUSIONToolkit following their documentation
+1. Install OpenFUSIONToolkit following their documentation (v1.0.0-beta5 version released Jan 23 2025)
 2. Clone this repository
 3. Ensure OpenFUSIONToolkit is accessible in your Python path
 
@@ -38,14 +38,13 @@ This project provides a complete framework for tokamak plasma simulation, includ
 - **Plasma Shaping**: Isoflux boundary point generation for precise plasma shape definition
 
 ### Plasma Parameters for the tokamak example (Negative Triangulation) 
-- Major radius: 4.55m
-- Minor radius: 1.2m
+- Major radius: 4.55
+- Minor radius: 1.2
 - Elongation: 1.4
 - Triangularity: -0.5
-- Configurable isoflux boundary points (30 points default)
 
 ### Coil System
-- Support for up to 8 poloidal field coils
+- Support for 8 poloidal field coils
 - Precise (R,Z) coordinate specification
 - Geometric constraint validation (coils positioned outside vacuum vessel)
 
@@ -63,24 +62,8 @@ This project provides a complete framework for tokamak plasma simulation, includ
 - **Coil Configuration**: Specify coil positions and current distributions
 
 ### Output Management
-The system automatically creates timestamped folders in `examples/` directory:
-- Format: `simulation_YYYYMMDD_HHMMSS/`
-- Contains simulation results, plots, and configuration files
-
-## Project Structure
-
-```
-tokamak_psp_2025/
-├── AOE_tokamaker.ipynb          # Main simulation notebook
-├── README.md                    # This file
-├── examples/                    # Simulation outputs
-│   ├── negative_triangulation_20250624_173927/
-│   ├── CUTE_VDE_ex.ipynb
-│   └── CUTE_sim.ipynb
-└── inspiration_code/            # Reference implementations
-    ├── CUTE_VDE_ex.ipynb 19-54-19-544.ipynb
-    └── CUTE_sim.ipynb
-```
+The system automatically creates designs and saves them in the testing_1 folder 
+- Contains simulation results, plots, and a json configuration file
 
 ### Geometric Constraints
 - Plasma boundary must fit within vacuum vessel
@@ -98,16 +81,9 @@ tokamak_psp_2025/
 - Coil and vessel boundary visualization
 - Customizable figure output with automatic saving
 
-## Examples
+## Questions
 
-The `examples/` directory contains:
-- **Simulation Runs**: Timestamped folders with complete simulation outputs
-- **VDE Analysis**: Vertical Displacement Event studies (`CUTE_VDE_ex.ipynb`)
-- **General Simulations**: Standard tokamak simulation examples (`CUTE_sim.ipynb`)
-
-## Contributing
-
-This project is part of ongoing plasma disruption research. For contributions or questions, please email nl2951@columbia.edu
+ For questions, please email nl2951@columbia.edu
 
 ## Acknowledgments
 
