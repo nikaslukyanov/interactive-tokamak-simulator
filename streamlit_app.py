@@ -68,7 +68,7 @@ def point_in_polygon(point, polygon):
         p1x, p1y = p2x, p2y
     return inside
 
-# Function to validate and fix coil positions
+# Function to validate coil positions
 def validate_coil_positions(coil_coords, vv_coords, plasma_boundary, safety_margin=0.5):
     validated_coords = []
     vv_array = np.array(vv_coords)
@@ -100,6 +100,27 @@ def validate_coil_positions(coil_coords, vv_coords, plasma_boundary, safety_marg
     
     return validated_coords
 
+def clear_results():
+    if 'analysis_completed' in st.session_state:
+        del st.session_state.analysis_completed
+    if 'output_folder' in st.session_state:
+        del st.session_state.output_folder
+    if 'locked_design' in st.session_state:
+        del st.session_state.locked_design
+    if 'design_file' in st.session_state:
+        del st.session_state.design_file
+
+    # Clear files
+    files = glob.glob('examples/testing_1/*')
+    for f in files:
+        if os.path.isfile(f):
+            os.remove(f)
+        elif os.path.isdir(f):
+            shutil.rmtree(f)
+    
+    # Force a complete page reload by clearing more session state
+    st.cache_data.clear()
+
 # Initialize session state
 if 'vv_coords' not in st.session_state:
     st.session_state.vv_coords = [
@@ -121,7 +142,7 @@ if 'original_coords' not in st.session_state:
     st.session_state.original_coords = None
 
 st.title("Custom Tokamak - Vacuum Vessel Design")
-col1, col2 = st.columns([1, 2])
+col1, col2 = st.columns([1, 4])
 
 with col1:
     st.header("Plasma Parameters")
@@ -317,7 +338,7 @@ with col2:
     # Configure layout
     fig.update_layout(
         width=800,
-        height=600,
+        height=750,
         xaxis_title="R (m)",
         yaxis_title="Z (m)",
         xaxis=dict(scaleanchor="y", scaleratio=1),
@@ -520,6 +541,8 @@ col_lock, col_run, col_status = st.columns([1, 1, 2])
 with col_lock:
     if st.button("🔒 Lock Design", type="primary", help="Save current design and prepare for analysis"):
         # Create design data structure
+        clear_results()
+
         design_data = {
             "timestamp": datetime.now().strftime("%Y%m%d_%H%M%S"),
             "plasma_parameters": {
@@ -663,60 +686,95 @@ if 'analysis_completed' in st.session_state and st.session_state.analysis_comple
         output_folder = os.path.join(current_dir, "tokamak_psp_2025", "examples", "testing_1")
     
     if os.path.exists(output_folder):
-        # Look for generated images in the output folder
+        # Look for specific numbered files in order
         image_files = []
-        for ext in ['*.png', '*.gif']:
-            image_files.extend(glob.glob(os.path.join(output_folder, ext)))
+        gif_files = []
         
-        if image_files:
-            st.write(f"**Analysis output from:** `{output_folder}`")
-            st.write(f"**Found {len(image_files)} image(s):**")
+        # Define the specific order for images
+        ordered_filenames = [
+            "01_vacuum_vessel_design.png",
+            "02_plasma_profiles.png", 
+            "03_initial_equilibrium.png",
+            "04_coil_currents.png",
+            "05_growth_rate_vs_beta_p.png",
+            "06_mode_structures_different_beta_p.png",
+            "07_nonlinear_plasma_evolution.png",
+            "09_vde_evolution.gif"
+        ]
+        
+        # Check which files exist and organize them
+        existing_images = {}
+        existing_gifs = []
+        
+        for filename in ordered_filenames:
+            file_path = os.path.join(output_folder, filename)
+            if os.path.exists(file_path):
+                if filename.lower().endswith('.gif'):
+                    existing_gifs.append(file_path)
+                else:
+                    # Extract the number prefix for organization
+                    file_number = filename.split('_')[0]
+                    existing_images[file_number] = file_path
+        
+        if existing_images or existing_gifs:            
+            # Display images in 2 columns with specific organization
+            # Column 1: 01, 03, 05
+            # Column 2: 02, 04, 06, 07
+            col1, col2 = st.columns(2)
             
-            # Separate GIF files from other images for different display handling
-            gif_files = [f for f in image_files if f.lower().endswith('.gif')]
-            other_images = [f for f in image_files if not f.lower().endswith('.gif')]
-            
-            # Display other images in a grid
-            if other_images:
-                cols = st.columns(2)
-                for i, img_path in enumerate(other_images):
-                    col_idx = i % 2
-                    with cols[col_idx]:
+            # Column 1 images (01, 03, 05)
+            column1_numbers = ["01", "03", "05"]
+            with col1:
+                for num in column1_numbers:
+                    if num in existing_images:
                         try:
-                            filename = os.path.basename(img_path)
+                            filename = os.path.basename(existing_images[num])
                             from PIL import Image
-                            img = Image.open(img_path)
+                            img = Image.open(existing_images[num])
                             st.image(img, caption=filename, use_container_width=True)
                         except Exception as e:
-                            st.error(f"Error loading {img_path}: {e}")
-                        # Display GIF files in full width
-
-            # if gif_files and other_images:
-            #     st.markdown("<br>", unsafe_allow_html=True)
+                            st.error(f"Error loading {existing_images[num]}: {e}")
             
-            for gif_path in gif_files:
-                try:
-                    filename = os.path.basename(gif_path)
-                    
-                    # Use base64 encoding for proper GIF display
-                    with open(gif_path, "rb") as gif_file:
-                        contents = gif_file.read()
-                        data_url = base64.b64encode(contents).decode("utf-8")
-                    
-                    # Display GIF using HTML with base64 encoding - full width
-                    st.markdown(
-                        f'<img src="data:image/gif;base64,{data_url}" alt="{filename}" style="width: 95%; max-width: 95%;">',
-                        unsafe_allow_html=True,
-                    )
-                    
-                    # Add caption below (matches st.image caption style)
-                    st.caption(filename)
-                    
-                except Exception as e:
-                    st.error(f"Error loading {gif_path}: {e}")
+            # Column 2 images (02, 04, 06, 07)
+            column2_numbers = ["02", "04", "06", "07"]
+            with col2:
+                for num in column2_numbers:
+                    if num in existing_images:
+                        try:
+                            filename = os.path.basename(existing_images[num])
+                            from PIL import Image
+                            img = Image.open(existing_images[num])
+                            st.image(img, caption=filename, use_container_width=True)
+                        except Exception as e:
+                            st.error(f"Error loading {existing_images[num]}: {e}")
+            
+            # Display GIF files below the columns (09)
+            if existing_gifs:
+                st.markdown("<br>", unsafe_allow_html=True)
+                
+                for gif_path in existing_gifs:
+                    try:
+                        filename = os.path.basename(gif_path)
+                        
+                        # Use base64 encoding for proper GIF display
+                        with open(gif_path, "rb") as gif_file:
+                            contents = gif_file.read()
+                            data_url = base64.b64encode(contents).decode("utf-8")
+                        
+                        # Display GIF using HTML with base64 encoding - full width
+                        st.markdown(
+                            f'<img src="data:image/gif;base64,{data_url}" alt="{filename}" style="width: 95%; max-width: 95%;">',
+                            unsafe_allow_html=True,
+                        )
+                        
+                        # Add caption below (matches st.image caption style)
+                        st.caption(filename)
+                        
+                    except Exception as e:
+                        st.error(f"Error loading {gif_path}: {e}")
 
         else:
-            st.warning(f"No images found in the output folder: {output_folder}")
+            st.warning(f"No result files found in the output folder: {output_folder}")
             # Debug information
             st.write("**Debug info:**")
             st.write(f"- Current working directory: {current_dir}")
@@ -734,24 +792,6 @@ if 'analysis_completed' in st.session_state and st.session_state.analysis_comple
     
     # Add button to clear results
     if st.button("🗑️ Clear Results"):
-        # Clear analysis-related session state
-        if 'analysis_completed' in st.session_state:
-            del st.session_state.analysis_completed
-        if 'output_folder' in st.session_state:
-            del st.session_state.output_folder
-        if 'locked_design' in st.session_state:
-            del st.session_state.locked_design
-        if 'design_file' in st.session_state:
-            del st.session_state.design_file
-
-        # Clear files
-        files = glob.glob('examples/testing_1/*')
-        for f in files:
-            if os.path.isfile(f):
-                os.remove(f)
-            elif os.path.isdir(f):
-                shutil.rmtree(f)
-        
-        # Force a complete page reload by clearing more session state
-        st.cache_data.clear()
+        clear_results()
         st.rerun()
+    
